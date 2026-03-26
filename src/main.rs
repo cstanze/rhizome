@@ -97,7 +97,7 @@ async fn main() -> anyhow::Result<(), AppError> {
     broadcast_tx,
   });
 
-  let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await?;
+  let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
   axum::serve(listener, app).await?;
 
   Ok(())

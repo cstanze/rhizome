@@ -23,6 +23,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /app/target/release/rhizome /usr/local/bin/rhizome
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD ["rhizome"]
