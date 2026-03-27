@@ -27,6 +27,13 @@ Expect for these features to be implemented in order of listing here.
 - [ ] Print profiles
 - [ ] Webhooks
 
+## Non-features
+
+This tool won't aim to have these features, this list may grow over time. In many cases, these features would be nice to have but are outside the scope of this project.
+
+- [ ] Cloud slicing
+  - Side note: this is a really nice feature to have but a finicky idea at best, may revisit
+
 ## License
 
 This project is covered under the MIT license. See [`LICENSE`](./LICENSE) for further details.
