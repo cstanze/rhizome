@@ -1,16 +1,27 @@
-use crate::AppState;
+use crate::{AppState, printer::PrinterSpeed};
 
-use super::super::service::print::{PrintStartRequest, verify_print_start_request};
 use axum::{
   extract::State,
   http::StatusCode,
   response::{IntoResponse, Json},
 };
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tracing::info;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PrintStartRequest {
+  pub path: String,
+}
+
+pub fn verify_print_start_request(req: &PrintStartRequest) -> bool {
+  // basically, path must start with "/sdcard/"
+  req.path.starts_with("/sdcard/")
+}
+
+// GET /print
 pub async fn print_status_handler(state: State<AppState>) -> Json<Value> {
-  let status = state.printer.read().await.status().await;
+  let status = state.printer.status().await;
 
   if let Some(status) = status {
     Json(json!({
@@ -32,6 +43,7 @@ pub async fn print_status_handler(state: State<AppState>) -> Json<Value> {
   }
 }
 
+// POST /print
 pub async fn start_print_handler(
   state: State<AppState>,
   Json(payload): Json<PrintStartRequest>,
@@ -45,7 +57,7 @@ pub async fn start_print_handler(
     );
   }
 
-  if let Ok(_) = state.printer.write().await.start_print(&payload.path).await {
+  if state.printer.start_print(&payload.path).await.is_ok() {
     info!("started print job: {}", payload.path);
   } else {
     return (
@@ -59,12 +71,9 @@ pub async fn start_print_handler(
   (StatusCode::OK, Json(serde_json::to_value(payload).unwrap()))
 }
 
+// PUT /print/pause
 pub async fn pause_print_handler(state: State<AppState>) -> impl IntoResponse {
-  if let Ok(_) = state.printer.write().await.send_command(json!({
-    "print": {
-      "command": "pause_print"
-    }
-  })).await {
+  if state.printer.pause_print().await.is_ok() {
     info!("paused print job");
   } else {
     return (
@@ -78,12 +87,9 @@ pub async fn pause_print_handler(state: State<AppState>) -> impl IntoResponse {
   (StatusCode::OK, Json(json!({})))
 }
 
+// PUT /print/resume
 pub async fn resume_print_handler(state: State<AppState>) -> impl IntoResponse {
-  if let Ok(_) = state.printer.write().await.send_command(json!({
-    "print": {
-      "command": "resume_print"
-    }
-  })).await {
+  if state.printer.resume_print().await.is_ok() {
     info!("resumed print job");
   } else {
     return (
@@ -97,12 +103,9 @@ pub async fn resume_print_handler(state: State<AppState>) -> impl IntoResponse {
   (StatusCode::OK, Json(json!({})))
 }
 
+// PUT /print/stop
 pub async fn stop_print_handler(state: State<AppState>) -> impl IntoResponse {
-  if let Ok(_) = state.printer.write().await.send_command(json!({
-    "print": {
-      "command": "stop_print"
-    }
-  })).await {
+  if state.printer.stop_print().await.is_ok() {
     info!("stopped print job");
   } else {
     return (
@@ -114,4 +117,46 @@ pub async fn stop_print_handler(state: State<AppState>) -> impl IntoResponse {
   }
 
   (StatusCode::OK, Json(json!({})))
+}
+
+// PUT /print/speed
+pub async fn set_print_speed_handler(
+  state: State<AppState>,
+  Json(payload): Json<Value>,
+) -> impl IntoResponse {
+  if let Some(speed) = payload.get("speed").and_then(|s| s.as_u64()) {
+    if !(1..=4).contains(&speed) {
+      return (
+        StatusCode::BAD_REQUEST,
+        Json(json!({
+          "error": "invalid 'speed' parameter, must be an unsigned integer [1-4]"
+        })),
+      );
+    }
+
+    if state
+      .printer
+      .set_speed(PrinterSpeed::from(speed as u8))
+      .await
+      .is_ok()
+    {
+      info!("set print speed to level {}", speed);
+    } else {
+      return (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(json!({
+          "error": "failed to set print speed"
+        })),
+      );
+    }
+
+    (StatusCode::OK, Json(json!({})))
+  } else {
+    (
+      StatusCode::BAD_REQUEST,
+      Json(json!({
+        "error": "missing or invalid 'speed' parameter, must be an unsigned integer [1-4]"
+      })),
+    )
+  }
 }

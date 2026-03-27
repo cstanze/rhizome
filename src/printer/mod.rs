@@ -17,17 +17,31 @@ pub struct PrinterConfig {
   pub access_code: String,
 }
 
+#[derive(Debug)]
 pub enum PrinterEvent {
   StatusUpdate(PrinterStatus),
   Disconnected,
 }
 
+#[allow(dead_code)]
 #[repr(u8)]
 pub enum PrinterSpeed {
   Silent = 1,    //    50%
   Normal = 2,    //   100%
   Sport = 3,     //    125%
   Ludicrous = 4, // 160%
+}
+
+impl From<u8> for PrinterSpeed {
+  fn from(value: u8) -> Self {
+    match value {
+      1 => PrinterSpeed::Silent,
+      2 => PrinterSpeed::Normal,
+      3 => PrinterSpeed::Sport,
+      4 => PrinterSpeed::Ludicrous,
+      _ => PrinterSpeed::Normal, // default to normal if invalid
+    }
+  }
 }
 
 #[derive(Clone)]

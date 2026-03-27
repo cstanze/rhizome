@@ -1,5 +1,5 @@
-use serde_json::Value;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PrinterStatus {
@@ -11,10 +11,10 @@ pub struct PrinterStatus {
   pub subtask_name: String, // current filename
   pub layer_num: u32,
   pub total_layers: u32,
-  pub progress: u32,      // %
-  pub remaining_min: u32, // estimated minutes left
-  pub speed_level: u8,        // 1=silent 2=standard 3=sport 4=ludicrous
-  pub speed_magnitude: u32,       // speed override %
+  pub progress: u32,        // %
+  pub remaining_min: u32,   // estimated minutes left
+  pub speed_level: u8,      // 1=silent 2=standard 3=sport 4=ludicrous
+  pub speed_magnitude: u32, // speed override %
 }
 
 impl PrinterStatus {
