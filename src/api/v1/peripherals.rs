@@ -6,7 +6,7 @@ use axum::{
   response::{IntoResponse, Json},
 };
 use serde_json::{Value, json};
-use tracing::info;
+use tracing::debug;
 
 // PUT /temperature/nozzle
 pub async fn nozzle_temperature_handler(
@@ -28,7 +28,7 @@ pub async fn nozzle_temperature_handler(
       .send_gcode(&format!("M104 S{}", target as u32))
       .await
       .ok();
-    info!("set nozzle temperature to {}°C", target);
+    debug!("set nozzle temperature to {}°C", target);
 
     (StatusCode::OK, Json(payload))
   } else {
@@ -61,7 +61,7 @@ pub async fn bed_temperature_handler(
       .send_gcode(&format!("M140 S{}", target as u32))
       .await
       .ok();
-    info!("set nozzle temperature to {}°C", target);
+    debug!("set nozzle temperature to {}°C", target);
 
     (StatusCode::OK, Json(payload))
   } else {
@@ -111,7 +111,7 @@ pub async fn fan_speed_handler(
         state.printer.send_gcode(&gcode).await.ok();
       }
 
-      info!("set {} fan speed to {}", fan, speed);
+      debug!("set {} fan speed to {}", fan, speed);
 
       (StatusCode::OK, Json(payload))
     } else {
@@ -148,7 +148,7 @@ pub async fn led_handler(state: State<AppState>, Json(payload): Json<Value>) -> 
       }
     });
     if state.printer.send_command(cmd).await.is_ok() {
-      info!(
+      debug!(
         "turned {} chamber light",
         if light_state { "on" } else { "off" }
       );

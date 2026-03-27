@@ -6,6 +6,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./data:/app/data
+      - ./config:/app/config
     environment:
       - TZ=UTC

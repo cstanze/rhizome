@@ -19,10 +19,12 @@ pub struct AppState {
 }
 
 pub fn build(client: PrinterClient, mut event_rx: mpsc::Receiver<PrinterEvent>) -> axum::Router {
-  let (broadcast_tx, _) = broadcast::channel::<Option<PrinterStatus>>(64);
+  let (broadcast_tx, keepalive_rx) = broadcast::channel::<Option<PrinterStatus>>(64);
 
   let tx = broadcast_tx.clone();
   task::spawn(async move {
+    let _keepalive = keepalive_rx; // keep the receiver alive to prevent the channel from closing
+    
     while let Some(event) = event_rx.recv().await {
       debug!("received printer event: {event:?}");
 

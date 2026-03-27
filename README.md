@@ -14,6 +14,7 @@ Expect for these features to be implemented in order of listing here.
   - [x] Set fan speed
   - [x] Set led state
   - [x] Run arbitrary g-code
+- [x] Printer/Server configuration (set printer ip, serial, access code)
 - [ ] Printer file management
 - [ ] Authentication / API keys
 - [ ] Queuing

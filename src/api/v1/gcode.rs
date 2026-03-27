@@ -6,7 +6,7 @@ use axum::{
   response::{IntoResponse, Json},
 };
 use serde_json::{Value, json};
-use tracing::info;
+use tracing::debug;
 
 // POST /gcode
 pub async fn send_gcode_handler(
@@ -15,7 +15,7 @@ pub async fn send_gcode_handler(
 ) -> impl IntoResponse {
   if let Some(command) = payload.get("lines").and_then(|v| v.as_str()) {
     state.printer.send_gcode(command).await.ok();
-    info!("sent G-code command: {}", command);
+    debug!("sent G-code command: {}", command);
 
     (StatusCode::OK, Json(payload))
   } else {

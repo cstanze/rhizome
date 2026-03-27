@@ -7,7 +7,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use tracing::info;
+use tracing::debug;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PrintStartRequest {
@@ -58,7 +58,7 @@ pub async fn start_print_handler(
   }
 
   if state.printer.start_print(&payload.path).await.is_ok() {
-    info!("started print job: {}", payload.path);
+    debug!("started print job: {}", payload.path);
   } else {
     return (
       StatusCode::INTERNAL_SERVER_ERROR,
@@ -74,7 +74,7 @@ pub async fn start_print_handler(
 // PUT /print/pause
 pub async fn pause_print_handler(state: State<AppState>) -> impl IntoResponse {
   if state.printer.pause_print().await.is_ok() {
-    info!("paused print job");
+    debug!("paused print job");
   } else {
     return (
       StatusCode::INTERNAL_SERVER_ERROR,
@@ -90,7 +90,7 @@ pub async fn pause_print_handler(state: State<AppState>) -> impl IntoResponse {
 // PUT /print/resume
 pub async fn resume_print_handler(state: State<AppState>) -> impl IntoResponse {
   if state.printer.resume_print().await.is_ok() {
-    info!("resumed print job");
+    debug!("resumed print job");
   } else {
     return (
       StatusCode::INTERNAL_SERVER_ERROR,
@@ -106,7 +106,7 @@ pub async fn resume_print_handler(state: State<AppState>) -> impl IntoResponse {
 // PUT /print/stop
 pub async fn stop_print_handler(state: State<AppState>) -> impl IntoResponse {
   if state.printer.stop_print().await.is_ok() {
-    info!("stopped print job");
+    debug!("stopped print job");
   } else {
     return (
       StatusCode::INTERNAL_SERVER_ERROR,
@@ -140,7 +140,7 @@ pub async fn set_print_speed_handler(
       .await
       .is_ok()
     {
-      info!("set print speed to level {}", speed);
+      debug!("set print speed to level {}", speed);
     } else {
       return (
         StatusCode::INTERNAL_SERVER_ERROR,

@@ -1,6 +1,8 @@
 mod status;
 mod tls;
 
+use crate::config::PrinterConfig;
+
 use rumqttc::{AsyncClient, Event, MqttOptions, Packet, QoS, TlsConfiguration, Transport};
 use rustls::ClientConfig;
 use serde_json::{Value, json};
@@ -10,12 +12,6 @@ use std::sync::{
   atomic::{AtomicU64, Ordering},
 };
 use tokio::sync::{RwLock, mpsc};
-
-pub struct PrinterConfig {
-  pub ip: String,
-  pub serial: String,
-  pub access_code: String,
-}
 
 #[derive(Debug)]
 pub enum PrinterEvent {
